@@ -1,0 +1,29 @@
+version: '3.9'
+services:
+  mysql:
+    image: mysql:8.1
+    container_name: pos_mysql
+    environment:
+      MYSQL_DATABASE: pos_ontheworld
+      MYSQL_USER: pos
+      MYSQL_PASSWORD: pos
+      MYSQL_ROOT_PASSWORD: rootpass
+    ports:
+      - '3307:3306'
+    volumes:
+      - mysql-data:/var/lib/mysql
+  app:
+    build:
+      context: .
+    ports:
+      - '8080:8080'
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/pos_ontheworld?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+      SPRING_DATASOURCE_USERNAME: pos
+      SPRING_DATASOURCE_PASSWORD: pos
+      JWT_SECRET: change-this-secret-to-a-secure-value
+    depends_on:
+      - mysql
+volumes:
+  mysql-data:
+    name: pos_mysql_data
