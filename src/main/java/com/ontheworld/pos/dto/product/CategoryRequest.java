@@ -14,4 +14,7 @@ public class CategoryRequest {
 
     private String descriptionTh;
     private String descriptionEn;
+
+    /** optional — ADMIN can specify; BRANCH_ADMIN auto-gets their branch; null = global */
+    private java.util.UUID branchId;
 }

@@ -13,4 +13,5 @@ public interface ProductStockRepository extends JpaRepository<ProductStock, UUID
     Optional<ProductStock> findByProductAndBranch(Product product, Branch branch);
     List<ProductStock> findByBranch(Branch branch);
     List<ProductStock> findByProduct(Product product);
+    long countByBranchAndQuantityEquals(Branch branch, int quantity);
 }

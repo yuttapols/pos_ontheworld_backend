@@ -92,7 +92,7 @@ public class CustomerServiceImpl implements CustomerService {
         customerRepository.save(customer);
         loyaltyTransactionRepository.save(new LoyaltyTransaction(
                 customer, LoyaltyTransactionType.MANUAL_ADD,
-                request.getPoints(), request.getReason(), null, currentUsername()));
+                request.getPoints(), request.getReason(), null, currentUsername(), null));
         return customerMapper.toResponse(customer);
     }
 
@@ -109,7 +109,7 @@ public class CustomerServiceImpl implements CustomerService {
         customerRepository.save(customer);
         loyaltyTransactionRepository.save(new LoyaltyTransaction(
                 customer, LoyaltyTransactionType.REDEEM,
-                request.getPoints(), request.getReason(), null, currentUsername()));
+                request.getPoints(), request.getReason(), null, currentUsername(), null));
         return customerMapper.toResponse(customer);
     }
 

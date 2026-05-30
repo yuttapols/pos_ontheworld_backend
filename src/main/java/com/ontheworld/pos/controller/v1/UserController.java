@@ -28,48 +28,51 @@ public class UserController {
     }
 
     @PostMapping
-    @PreAuthorize("hasRole('ADMIN')")
-    @Operation(summary = "Create a new user")
-    public ResponseEntity<UserResponse> create(@Valid @RequestBody UserRequest request) {
-        return ResponseEntity.ok(userService.createUser(request));
+    @PreAuthorize("hasAnyRole('ADMIN', 'BRANCH_ADMIN')")
+    @Operation(summary = "Create a new user (ADMIN: any role/branch | BRANCH_ADMIN: MANAGER/CASHIER in their branch)")
+    public ResponseEntity<UserResponse> create(@Valid @RequestBody UserRequest request,
+                                               @AuthenticationPrincipal UserDetails caller) {
+        return ResponseEntity.ok(userService.createUser(request, caller.getUsername()));
     }
 
     @GetMapping
-    @PreAuthorize("hasRole('ADMIN') or hasRole('MANAGER')")
-    @Operation(summary = "List all users")
-    public ResponseEntity<List<UserResponse>> list() {
-        return ResponseEntity.ok(userService.listUsers());
+    @PreAuthorize("hasAnyRole('ADMIN', 'BRANCH_ADMIN', 'MANAGER', 'CASHIER')")
+    @Operation(summary = "List users (scoped by caller role: ADMIN=all, BRANCH_ADMIN=branch employees, MANAGER=cashiers, CASHIER=self)")
+    public ResponseEntity<List<UserResponse>> list(@AuthenticationPrincipal UserDetails caller) {
+        return ResponseEntity.ok(userService.listUsers(caller.getUsername()));
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN') or hasRole('MANAGER')")
-    @Operation(summary = "Get user by ID")
-    public ResponseEntity<UserResponse> get(@PathVariable UUID id) {
-        return ResponseEntity.ok(userService.getUser(id));
+    @PreAuthorize("hasAnyRole('ADMIN', 'BRANCH_ADMIN', 'MANAGER', 'CASHIER')")
+    @Operation(summary = "Get user by ID (scoped by caller role)")
+    public ResponseEntity<UserResponse> get(@PathVariable UUID id,
+                                            @AuthenticationPrincipal UserDetails caller) {
+        return ResponseEntity.ok(userService.getUser(id, caller.getUsername()));
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
-    @Operation(summary = "Update a user")
+    @PreAuthorize("hasAnyRole('ADMIN', 'BRANCH_ADMIN')")
+    @Operation(summary = "Update a user (ADMIN: any | BRANCH_ADMIN: MANAGER/CASHIER in their branch)")
     public ResponseEntity<UserResponse> update(@PathVariable UUID id,
-                                               @Valid @RequestBody UserRequest request) {
-        return ResponseEntity.ok(userService.updateUser(id, request));
+                                               @Valid @RequestBody UserRequest request,
+                                               @AuthenticationPrincipal UserDetails caller) {
+        return ResponseEntity.ok(userService.updateUser(id, request, caller.getUsername()));
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
-    @Operation(summary = "Soft delete a user")
+    @PreAuthorize("hasAnyRole('ADMIN', 'BRANCH_ADMIN')")
+    @Operation(summary = "Soft delete a user (ADMIN: any | BRANCH_ADMIN: MANAGER/CASHIER in their branch)")
     public ResponseEntity<Void> delete(@PathVariable UUID id,
-                                       @AuthenticationPrincipal UserDetails user) {
-        userService.deleteUser(id, user.getUsername());
+                                       @AuthenticationPrincipal UserDetails caller) {
+        userService.deleteUser(id, caller.getUsername());
         return ResponseEntity.noContent().build();
     }
 
     @PutMapping("/me/password")
     @Operation(summary = "Change password for the currently logged-in user")
     public ResponseEntity<Void> changePassword(@Valid @RequestBody ChangePasswordRequest request,
-                                               @AuthenticationPrincipal UserDetails user) {
-        userService.changePassword(user.getUsername(), request);
+                                               @AuthenticationPrincipal UserDetails caller) {
+        userService.changePassword(caller.getUsername(), request);
         return ResponseEntity.noContent().build();
     }
 }

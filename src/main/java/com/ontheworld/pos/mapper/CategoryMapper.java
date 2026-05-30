@@ -12,6 +12,9 @@ import java.util.List;
 @Mapper(componentModel = "spring")
 public interface CategoryMapper {
 
+    @Mapping(source = "branch.id",     target = "branchId")
+    @Mapping(source = "branch.nameTh", target = "branchNameTh")
+    @Mapping(source = "branch.nameEn", target = "branchNameEn")
     CategoryResponse toResponse(Category category);
 
     List<CategoryResponse> toResponseList(List<Category> categories);
@@ -21,6 +24,7 @@ public interface CategoryMapper {
     @Mapping(target = "updatedAt", ignore = true)
     @Mapping(target = "deletedAt", ignore = true)
     @Mapping(target = "deletedBy", ignore = true)
+    @Mapping(target = "branch", ignore = true)
     Category toEntity(CategoryRequest request);
 
     @Mapping(target = "id", ignore = true)
@@ -28,5 +32,6 @@ public interface CategoryMapper {
     @Mapping(target = "updatedAt", ignore = true)
     @Mapping(target = "deletedAt", ignore = true)
     @Mapping(target = "deletedBy", ignore = true)
+    @Mapping(target = "branch", ignore = true)
     void updateEntity(CategoryRequest request, @MappingTarget Category category);
 }

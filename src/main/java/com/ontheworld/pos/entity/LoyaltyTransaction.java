@@ -35,13 +35,20 @@ public class LoyaltyTransaction extends BaseEntity {
     @Column(nullable = false)
     private String createdBy;
 
+    /** Branch where this transaction occurred (null for system-initiated) */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "branch_id")
+    private Branch branch;
+
     public LoyaltyTransaction(Customer customer, LoyaltyTransactionType type,
-                               Integer points, String reason, UUID referenceId, String createdBy) {
+                               Integer points, String reason, UUID referenceId,
+                               String createdBy, Branch branch) {
         this.customer = customer;
         this.type = type;
         this.points = points;
         this.reason = reason;
         this.referenceId = referenceId;
         this.createdBy = createdBy;
+        this.branch = branch;
     }
 }

@@ -12,6 +12,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
@@ -42,12 +44,13 @@ public class SaleController {
     }
 
     @GetMapping
-    @PreAuthorize("hasRole('ADMIN') or hasRole('MANAGER')")
-    @Operation(summary = "List all sales with pagination")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('BRANCH_ADMIN') or hasRole('MANAGER')")
+    @Operation(summary = "List sales (branch-scoped for non-ADMIN)")
     public ResponseEntity<PageResponse<SaleResponse>> list(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "20") int size) {
+            @RequestParam(defaultValue = "20") int size,
+            @AuthenticationPrincipal UserDetails caller) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
-        return ResponseEntity.ok(saleService.listSales(pageable));
+        return ResponseEntity.ok(saleService.listSales(caller.getUsername(), pageable));
     }
 }

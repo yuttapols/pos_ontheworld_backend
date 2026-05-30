@@ -7,8 +7,8 @@ import java.util.List;
 import java.util.UUID;
 
 public interface CategoryService {
-    CategoryResponse createCategory(CategoryRequest request);
+    CategoryResponse createCategory(CategoryRequest request, String callerUsername);
     CategoryResponse updateCategory(UUID id, CategoryRequest request);
     void deleteCategory(UUID id, String performedBy);
-    List<CategoryResponse> listCategories();
+    List<CategoryResponse> listCategories(String callerUsername);
 }

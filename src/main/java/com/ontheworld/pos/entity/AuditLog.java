@@ -29,6 +29,11 @@ public class AuditLog extends BaseEntity {
     @JoinColumn(name = "user_id")
     private UserAccount user;
 
+    /** Branch of the user who performed the action (null for system/ADMIN with no branch) */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "branch_id")
+    private Branch branch;
+
     public AuditLog(String entityName, String entityId, String action,
                     String detail, UserAccount user) {
         this.entityName = entityName;
@@ -36,5 +41,6 @@ public class AuditLog extends BaseEntity {
         this.action = action;
         this.detail = detail;
         this.user = user;
+        this.branch = (user != null) ? user.getBranch() : null;
     }
 }

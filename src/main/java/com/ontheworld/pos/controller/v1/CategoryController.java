@@ -27,16 +27,17 @@ public class CategoryController {
     }
 
     @PostMapping
-    @PreAuthorize("hasRole('ADMIN') or hasRole('MANAGER')")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('BRANCH_ADMIN') or hasRole('MANAGER')")
     @Operation(summary = "Create a new category")
-    public ResponseEntity<CategoryResponse> create(@Valid @RequestBody CategoryRequest request) {
-        return ResponseEntity.ok(categoryService.createCategory(request));
+    public ResponseEntity<CategoryResponse> create(@Valid @RequestBody CategoryRequest request,
+                                                    @AuthenticationPrincipal UserDetails caller) {
+        return ResponseEntity.ok(categoryService.createCategory(request, caller.getUsername()));
     }
 
     @GetMapping
-    @Operation(summary = "List all categories")
-    public ResponseEntity<List<CategoryResponse>> list() {
-        return ResponseEntity.ok(categoryService.listCategories());
+    @Operation(summary = "List categories (branch-scoped for non-ADMIN)")
+    public ResponseEntity<List<CategoryResponse>> list(@AuthenticationPrincipal UserDetails caller) {
+        return ResponseEntity.ok(categoryService.listCategories(caller.getUsername()));
     }
 
     @PutMapping("/{id}")

@@ -45,6 +45,11 @@ public class Product extends SoftDeletableEntity {
     @Column(length = 500)
     private String imageUrl;
 
+    /** null = global product (all branches); non-null = belongs to specific branch */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "branch_id")
+    private Branch branch;
+
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<ProductStock> stocks = new HashSet<>();
 

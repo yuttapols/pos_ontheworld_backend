@@ -111,7 +111,7 @@ public class SaleServiceImpl implements SaleService {
                 customerRepository.save(customer);
                 loyaltyTransactionRepository.save(new LoyaltyTransaction(
                         customer, LoyaltyTransactionType.EARN, pointsEarned,
-                        "Earned from sale " + receiptNumber, sale.getId(), cashier.getUsername()));
+                        "Earned from sale " + receiptNumber, sale.getId(), cashier.getUsername(), branch));
             }
         }
 
@@ -129,8 +129,13 @@ public class SaleServiceImpl implements SaleService {
     }
 
     @Override
-    public PageResponse<SaleResponse> listSales(Pageable pageable) {
-        Page<Sale> page = saleRepository.findAll(pageable);
+    public PageResponse<SaleResponse> listSales(String callerUsername, Pageable pageable) {
+        UserAccount caller = userAccountRepository.findByUsername(callerUsername)
+                .orElseThrow(() -> new EntityNotFoundException("User not found: " + callerUsername));
+        Page<Sale> page = switch (caller.getRole()) {
+            case ADMIN -> saleRepository.findAll(pageable);
+            default -> saleRepository.findByBranch(caller.getBranch(), pageable);
+        };
         return new PageResponse<>(
                 page.stream().map(saleMapper::toResponse).collect(Collectors.toList()),
                 page.getTotalElements(),

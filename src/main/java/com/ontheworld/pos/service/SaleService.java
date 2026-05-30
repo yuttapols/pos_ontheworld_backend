@@ -10,5 +10,5 @@ import java.util.UUID;
 public interface SaleService {
     UUID createSale(SaleRequest request);
     SaleResponse getSale(UUID id);
-    PageResponse<SaleResponse> listSales(Pageable pageable);
+    PageResponse<SaleResponse> listSales(String callerUsername, Pageable pageable);
 }

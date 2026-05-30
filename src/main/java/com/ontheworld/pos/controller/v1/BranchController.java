@@ -2,6 +2,7 @@ package com.ontheworld.pos.controller.v1;
 
 import com.ontheworld.pos.dto.branch.BranchRequest;
 import com.ontheworld.pos.dto.branch.BranchResponse;
+import com.ontheworld.pos.dto.branch.BranchStatsResponse;
 import com.ontheworld.pos.service.BranchService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -60,5 +61,21 @@ public class BranchController {
                                        @AuthenticationPrincipal UserDetails user) {
         branchService.deleteBranch(id, user.getUsername());
         return ResponseEntity.noContent().build();
+    }
+
+    // ── Branch Stats ──────────────────────────────────────────────────────────
+
+    @GetMapping("/me/stats")
+    @PreAuthorize("hasRole('BRANCH_ADMIN')")
+    @Operation(summary = "Get dashboard stats for the caller's branch (BRANCH_ADMIN only)")
+    public ResponseEntity<BranchStatsResponse> myStats(@AuthenticationPrincipal UserDetails caller) {
+        return ResponseEntity.ok(branchService.getBranchStats(caller.getUsername()));
+    }
+
+    @GetMapping("/{id}/stats")
+    @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "Get dashboard stats for any branch by ID (ADMIN only)")
+    public ResponseEntity<BranchStatsResponse> statsByBranch(@PathVariable UUID id) {
+        return ResponseEntity.ok(branchService.getBranchStatsByIdForAdmin(id));
     }
 }

@@ -13,7 +13,7 @@ import lombok.Setter;
 @Table(name = "categories")
 public class Category extends SoftDeletableEntity {
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     private String nameTh;
 
     @Column(nullable = false)
@@ -24,6 +24,11 @@ public class Category extends SoftDeletableEntity {
 
     @Column(length = 250)
     private String descriptionEn;
+
+    /** null = global (visible to all branches); non-null = belongs to specific branch */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "branch_id")
+    private Branch branch;
 
     public Category(String nameTh, String nameEn, String descriptionTh, String descriptionEn) {
         this.nameTh = nameTh;

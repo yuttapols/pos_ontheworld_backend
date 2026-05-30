@@ -2,15 +2,17 @@ package com.ontheworld.pos.mapper;
 
 import com.ontheworld.pos.dto.product.CategoryRequest;
 import com.ontheworld.pos.dto.product.CategoryResponse;
+import com.ontheworld.pos.entity.Branch;
 import com.ontheworld.pos.entity.Category;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import javax.annotation.processing.Generated;
 import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2569-05-25T20:34:15+0700",
+    date = "2569-05-30T12:08:07+0700",
     comments = "version: 1.5.5.Final, compiler: Eclipse JDT (IDE) 3.46.0.v20260407-0427, environment: Java 21.0.10 (Eclipse Adoptium)"
 )
 @Component
@@ -24,6 +26,9 @@ public class CategoryMapperImpl implements CategoryMapper {
 
         CategoryResponse categoryResponse = new CategoryResponse();
 
+        categoryResponse.setBranchId( categoryBranchId( category ) );
+        categoryResponse.setBranchNameTh( categoryBranchNameTh( category ) );
+        categoryResponse.setBranchNameEn( categoryBranchNameEn( category ) );
         categoryResponse.setCreatedAt( category.getCreatedAt() );
         categoryResponse.setDescriptionEn( category.getDescriptionEn() );
         categoryResponse.setDescriptionTh( category.getDescriptionTh() );
@@ -75,5 +80,50 @@ public class CategoryMapperImpl implements CategoryMapper {
         category.setDescriptionTh( request.getDescriptionTh() );
         category.setNameEn( request.getNameEn() );
         category.setNameTh( request.getNameTh() );
+    }
+
+    private UUID categoryBranchId(Category category) {
+        if ( category == null ) {
+            return null;
+        }
+        Branch branch = category.getBranch();
+        if ( branch == null ) {
+            return null;
+        }
+        UUID id = branch.getId();
+        if ( id == null ) {
+            return null;
+        }
+        return id;
+    }
+
+    private String categoryBranchNameTh(Category category) {
+        if ( category == null ) {
+            return null;
+        }
+        Branch branch = category.getBranch();
+        if ( branch == null ) {
+            return null;
+        }
+        String nameTh = branch.getNameTh();
+        if ( nameTh == null ) {
+            return null;
+        }
+        return nameTh;
+    }
+
+    private String categoryBranchNameEn(Category category) {
+        if ( category == null ) {
+            return null;
+        }
+        Branch branch = category.getBranch();
+        if ( branch == null ) {
+            return null;
+        }
+        String nameEn = branch.getNameEn();
+        if ( nameEn == null ) {
+            return null;
+        }
+        return nameEn;
     }
 }

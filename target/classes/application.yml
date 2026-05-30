@@ -44,3 +44,8 @@ springdoc:
   swagger-ui:
     path: /swagger-ui.html
 
+cloudinary:
+  cloud-name: dynenuld8
+  api-key: 681122943437993
+  api-secret: jH-3OS0kKBpDFjpK49oD2t_9j-k
+

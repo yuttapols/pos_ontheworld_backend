@@ -111,6 +111,25 @@
             <artifactId>mysql-connector-j</artifactId>
         </dependency>
 
+        <!-- ZXing (barcode generation) -->
+        <dependency>
+            <groupId>com.google.zxing</groupId>
+            <artifactId>core</artifactId>
+            <version>3.5.2</version>
+        </dependency>
+        <dependency>
+            <groupId>com.google.zxing</groupId>
+            <artifactId>javase</artifactId>
+            <version>3.5.2</version>
+        </dependency>
+
+        <!-- Cloudinary (image upload) -->
+        <dependency>
+            <groupId>com.cloudinary</groupId>
+            <artifactId>cloudinary-http44</artifactId>
+            <version>1.36.0</version>
+        </dependency>
+
         <!-- Apache POI (Excel export) -->
         <dependency>
             <groupId>org.apache.poi</groupId>

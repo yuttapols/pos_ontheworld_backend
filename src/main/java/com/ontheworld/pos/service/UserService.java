@@ -8,10 +8,10 @@ import java.util.List;
 import java.util.UUID;
 
 public interface UserService {
-    UserResponse createUser(UserRequest request);
-    UserResponse getUser(UUID id);
-    List<UserResponse> listUsers();
-    UserResponse updateUser(UUID id, UserRequest request);
+    UserResponse createUser(UserRequest request, String callerUsername);
+    UserResponse getUser(UUID id, String callerUsername);
+    List<UserResponse> listUsers(String callerUsername);
+    UserResponse updateUser(UUID id, UserRequest request, String callerUsername);
     void deleteUser(UUID id, String performedBy);
     void changePassword(String username, ChangePasswordRequest request);
 }
