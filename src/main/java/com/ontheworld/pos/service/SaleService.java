@@ -8,7 +8,7 @@ import org.springframework.data.domain.Pageable;
 import java.util.UUID;
 
 public interface SaleService {
-    UUID createSale(SaleRequest request);
-    SaleResponse getSale(UUID id);
-    PageResponse<SaleResponse> listSales(String callerUsername, Pageable pageable);
+    UUID createSale(UUID branchId, SaleRequest request);
+    SaleResponse getSale(UUID branchId, UUID id);
+    PageResponse<SaleResponse> listSales(UUID branchId, Pageable pageable);
 }

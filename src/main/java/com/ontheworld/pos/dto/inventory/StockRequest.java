@@ -14,9 +14,6 @@ public class StockRequest {
     private UUID productId;
 
     @NotNull
-    private UUID branchId;
-
-    @NotNull
     @Min(1)
     private Integer quantity;
 

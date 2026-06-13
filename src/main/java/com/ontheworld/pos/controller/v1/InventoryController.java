@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/v1/inventory")
+@RequestMapping("/api/v1/branches/{branchId}/inventory")
 @Tag(name = "Inventory")
 public class InventoryController {
 
@@ -24,28 +24,29 @@ public class InventoryController {
         this.inventoryService = inventoryService;
     }
 
+    @GetMapping
+    @PreAuthorize("hasRole('ADMIN') or hasRole('BRANCH_ADMIN') or hasRole('MANAGER') or hasRole('CASHIER')")
+    @Operation(summary = "List stock levels for a branch (optionally filter by productId)")
+    public ResponseEntity<List<StockResponse>> list(@PathVariable UUID branchId,
+                                                     @RequestParam(required = false) UUID productId) {
+        return ResponseEntity.ok(inventoryService.listStock(branchId, productId));
+    }
+
     @PostMapping("/increase")
-    @PreAuthorize("hasRole('ADMIN') or hasRole('MANAGER') or hasRole('CASHIER')")
-    @Operation(summary = "Increase stock for a product at a branch")
-    public ResponseEntity<Void> increase(@Valid @RequestBody StockRequest request) {
-        inventoryService.increaseStock(request);
+    @PreAuthorize("hasRole('ADMIN') or hasRole('BRANCH_ADMIN') or hasRole('MANAGER') or hasRole('CASHIER')")
+    @Operation(summary = "Increase stock for a product at this branch")
+    public ResponseEntity<Void> increase(@PathVariable UUID branchId,
+                                         @Valid @RequestBody StockRequest request) {
+        inventoryService.increaseStock(branchId, request);
         return ResponseEntity.noContent().build();
     }
 
     @PostMapping("/decrease")
-    @PreAuthorize("hasRole('ADMIN') or hasRole('MANAGER') or hasRole('CASHIER')")
-    @Operation(summary = "Decrease stock for a product at a branch")
-    public ResponseEntity<Void> decrease(@Valid @RequestBody StockRequest request) {
-        inventoryService.decreaseStock(request);
+    @PreAuthorize("hasRole('ADMIN') or hasRole('BRANCH_ADMIN') or hasRole('MANAGER') or hasRole('CASHIER')")
+    @Operation(summary = "Decrease stock for a product at this branch")
+    public ResponseEntity<Void> decrease(@PathVariable UUID branchId,
+                                          @Valid @RequestBody StockRequest request) {
+        inventoryService.decreaseStock(branchId, request);
         return ResponseEntity.noContent().build();
-    }
-
-    @GetMapping("/stock")
-    @PreAuthorize("hasRole('ADMIN') or hasRole('MANAGER') or hasRole('CASHIER')")
-    @Operation(summary = "List stock levels — filter by branchId and/or productId")
-    public ResponseEntity<List<StockResponse>> stock(
-            @RequestParam(required = false) UUID branchId,
-            @RequestParam(required = false) UUID productId) {
-        return ResponseEntity.ok(inventoryService.listStock(branchId, productId));
     }
 }

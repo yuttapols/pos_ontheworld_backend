@@ -10,9 +10,10 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.util.Map;
+import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/v1/reports")
+@RequestMapping("/api/v1/branches/{branchId}/reports")
 @Tag(name = "Reports")
 public class ReportController {
 
@@ -23,18 +24,20 @@ public class ReportController {
     }
 
     @GetMapping("/daily/{date}")
-    @PreAuthorize("hasRole('ADMIN') or hasRole('MANAGER')")
-    @Operation(summary = "Daily sales report")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('BRANCH_ADMIN') or hasRole('MANAGER')")
+    @Operation(summary = "Daily sales report for a branch")
     public ResponseEntity<Map<String, Object>> dailySales(
+            @PathVariable UUID branchId,
             @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
-        return ResponseEntity.ok(reportService.dailySales(date));
+        return ResponseEntity.ok(reportService.dailySales(branchId, date));
     }
 
     @GetMapping("/monthly/{year}/{month}")
-    @PreAuthorize("hasRole('ADMIN') or hasRole('MANAGER')")
-    @Operation(summary = "Monthly sales report")
-    public ResponseEntity<Map<String, Object>> monthlySales(@PathVariable int year,
+    @PreAuthorize("hasRole('ADMIN') or hasRole('BRANCH_ADMIN') or hasRole('MANAGER')")
+    @Operation(summary = "Monthly sales report for a branch")
+    public ResponseEntity<Map<String, Object>> monthlySales(@PathVariable UUID branchId,
+                                                             @PathVariable int year,
                                                              @PathVariable int month) {
-        return ResponseEntity.ok(reportService.monthlySales(year, month));
+        return ResponseEntity.ok(reportService.monthlySales(branchId, year, month));
     }
 }

@@ -21,5 +21,6 @@ public class SaleResponse {
     private BigDecimal discount;
     private BigDecimal tax;
     private BigDecimal total;
+    private boolean isActive;
     private LocalDateTime createdAt;
 }

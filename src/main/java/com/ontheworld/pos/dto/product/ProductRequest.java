@@ -46,6 +46,5 @@ public class ProductRequest {
 
     // imageUrl is intentionally excluded — set only via POST /{id}/image (Cloudinary upload)
 
-    /** optional — ADMIN can specify; BRANCH_ADMIN auto-gets their branch; null = global */
-    private UUID branchId;
+    private Boolean isActive;
 }

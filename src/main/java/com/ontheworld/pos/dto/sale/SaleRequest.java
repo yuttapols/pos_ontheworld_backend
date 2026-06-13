@@ -12,9 +12,6 @@ import java.util.UUID;
 @Data
 public class SaleRequest {
 
-    @NotNull
-    private UUID branchId;
-
     private UUID customerId;
 
     @NotEmpty

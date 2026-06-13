@@ -5,14 +5,12 @@ import com.ontheworld.pos.dto.sale.SaleItemRequest;
 import com.ontheworld.pos.dto.sale.SaleRequest;
 import com.ontheworld.pos.dto.sale.SaleResponse;
 import com.ontheworld.pos.entity.*;
-import com.ontheworld.pos.mapper.SaleMapper;
 import com.ontheworld.pos.exception.BadRequestException;
 import com.ontheworld.pos.exception.EntityNotFoundException;
+import com.ontheworld.pos.mapper.SaleMapper;
 import com.ontheworld.pos.repository.*;
 import com.ontheworld.pos.service.AuditService;
 import com.ontheworld.pos.service.SaleService;
-import com.ontheworld.pos.entity.LoyaltyTransaction;
-import com.ontheworld.pos.entity.LoyaltyTransactionType;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -63,9 +61,8 @@ public class SaleServiceImpl implements SaleService {
 
     @Override
     @Transactional
-    public UUID createSale(SaleRequest request) {
-        Branch branch = branchRepository.findById(request.getBranchId())
-                .orElseThrow(() -> new EntityNotFoundException("Branch not found: " + request.getBranchId()));
+    public UUID createSale(UUID branchId, SaleRequest request) {
+        Branch branch = requireBranch(branchId);
         UserAccount cashier = currentUser();
         Customer customer = null;
         if (request.getCustomerId() != null) {
@@ -122,20 +119,20 @@ public class SaleServiceImpl implements SaleService {
     }
 
     @Override
-    public SaleResponse getSale(UUID id) {
-        return saleRepository.findById(id)
-                .map(saleMapper::toResponse)
+    public SaleResponse getSale(UUID branchId, UUID id) {
+        Branch branch = requireBranch(branchId);
+        Sale sale = saleRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Sale not found: " + id));
+        if (!sale.getBranch().getId().equals(branch.getId())) {
+            throw new EntityNotFoundException("Sale not found in this branch");
+        }
+        return saleMapper.toResponse(sale);
     }
 
     @Override
-    public PageResponse<SaleResponse> listSales(String callerUsername, Pageable pageable) {
-        UserAccount caller = userAccountRepository.findByUsername(callerUsername)
-                .orElseThrow(() -> new EntityNotFoundException("User not found: " + callerUsername));
-        Page<Sale> page = switch (caller.getRole()) {
-            case ADMIN -> saleRepository.findAll(pageable);
-            default -> saleRepository.findByBranch(caller.getBranch(), pageable);
-        };
+    public PageResponse<SaleResponse> listSales(UUID branchId, Pageable pageable) {
+        Branch branch = requireBranch(branchId);
+        Page<Sale> page = saleRepository.findByBranch(branch, pageable);
         return new PageResponse<>(
                 page.stream().map(saleMapper::toResponse).collect(Collectors.toList()),
                 page.getTotalElements(),
@@ -143,6 +140,13 @@ public class SaleServiceImpl implements SaleService {
                 page.getNumber(),
                 page.getSize()
         );
+    }
+
+    // ── helpers ──────────────────────────────────────────────────────────────
+
+    private Branch requireBranch(UUID branchId) {
+        return branchRepository.findById(branchId)
+                .orElseThrow(() -> new EntityNotFoundException("Branch not found: " + branchId));
     }
 
     private String generateReceiptNumber() {

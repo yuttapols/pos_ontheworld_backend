@@ -2,6 +2,7 @@ package com.ontheworld.pos.mapper;
 
 import com.ontheworld.pos.dto.product.ProductRequest;
 import com.ontheworld.pos.dto.product.ProductResponse;
+import com.ontheworld.pos.entity.Branch;
 import com.ontheworld.pos.entity.Category;
 import com.ontheworld.pos.entity.Product;
 import java.util.ArrayList;
@@ -12,7 +13,7 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2569-05-30T12:08:07+0700",
+    date = "2569-06-13T09:32:59+0700",
     comments = "version: 1.5.5.Final, compiler: Eclipse JDT (IDE) 3.46.0.v20260407-0427, environment: Java 21.0.10 (Eclipse Adoptium)"
 )
 @Component
@@ -29,6 +30,10 @@ public class ProductMapperImpl implements ProductMapper {
         productResponse.setCategoryId( productCategoryId( product ) );
         productResponse.setCategoryNameTh( productCategoryNameTh( product ) );
         productResponse.setCategoryNameEn( productCategoryNameEn( product ) );
+        productResponse.setBranchId( productBranchId( product ) );
+        productResponse.setBranchNameTh( productBranchNameTh( product ) );
+        productResponse.setBranchNameEn( productBranchNameEn( product ) );
+        productResponse.setActive( product.isActive() );
         productResponse.setBarcode( product.getBarcode() );
         productResponse.setCost( product.getCost() );
         productResponse.setCreatedAt( product.getCreatedAt() );
@@ -131,6 +136,51 @@ public class ProductMapperImpl implements ProductMapper {
             return null;
         }
         String nameEn = category.getNameEn();
+        if ( nameEn == null ) {
+            return null;
+        }
+        return nameEn;
+    }
+
+    private UUID productBranchId(Product product) {
+        if ( product == null ) {
+            return null;
+        }
+        Branch branch = product.getBranch();
+        if ( branch == null ) {
+            return null;
+        }
+        UUID id = branch.getId();
+        if ( id == null ) {
+            return null;
+        }
+        return id;
+    }
+
+    private String productBranchNameTh(Product product) {
+        if ( product == null ) {
+            return null;
+        }
+        Branch branch = product.getBranch();
+        if ( branch == null ) {
+            return null;
+        }
+        String nameTh = branch.getNameTh();
+        if ( nameTh == null ) {
+            return null;
+        }
+        return nameTh;
+    }
+
+    private String productBranchNameEn(Product product) {
+        if ( product == null ) {
+            return null;
+        }
+        Branch branch = product.getBranch();
+        if ( branch == null ) {
+            return null;
+        }
+        String nameEn = branch.getNameEn();
         if ( nameEn == null ) {
             return null;
         }

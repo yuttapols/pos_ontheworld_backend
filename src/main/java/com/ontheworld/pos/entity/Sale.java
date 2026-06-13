@@ -50,6 +50,9 @@ public class Sale extends BaseEntity {
     @Column(nullable = false)
     private BigDecimal total = BigDecimal.ZERO;
 
+    @Column(nullable = false)
+    private boolean isActive = true;
+
     public Sale(String receiptNumber, Branch branch, UserAccount cashier, Customer customer) {
         this.receiptNumber = receiptNumber;
         this.branch = branch;

@@ -12,14 +12,12 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/v1/sales")
+@RequestMapping("/api/v1/branches/{branchId}/sales")
 @Tag(name = "Sales")
 public class SaleController {
 
@@ -30,27 +28,29 @@ public class SaleController {
     }
 
     @PostMapping
-    @PreAuthorize("hasRole('ADMIN') or hasRole('MANAGER') or hasRole('CASHIER')")
-    @Operation(summary = "Create a new sale")
-    public ResponseEntity<UUID> createSale(@Valid @RequestBody SaleRequest request) {
-        return ResponseEntity.ok(saleService.createSale(request));
-    }
-
-    @GetMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN') or hasRole('MANAGER') or hasRole('CASHIER')")
-    @Operation(summary = "Get sale by ID")
-    public ResponseEntity<SaleResponse> get(@PathVariable UUID id) {
-        return ResponseEntity.ok(saleService.getSale(id));
+    @PreAuthorize("hasRole('ADMIN') or hasRole('BRANCH_ADMIN') or hasRole('MANAGER') or hasRole('CASHIER')")
+    @Operation(summary = "Create a new sale for a branch")
+    public ResponseEntity<UUID> createSale(@PathVariable UUID branchId,
+                                           @Valid @RequestBody SaleRequest request) {
+        return ResponseEntity.ok(saleService.createSale(branchId, request));
     }
 
     @GetMapping
     @PreAuthorize("hasRole('ADMIN') or hasRole('BRANCH_ADMIN') or hasRole('MANAGER')")
-    @Operation(summary = "List sales (branch-scoped for non-ADMIN)")
+    @Operation(summary = "List sales for a branch (paginated, newest first)")
     public ResponseEntity<PageResponse<SaleResponse>> list(
+            @PathVariable UUID branchId,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "20") int size,
-            @AuthenticationPrincipal UserDetails caller) {
+            @RequestParam(defaultValue = "20") int size) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
-        return ResponseEntity.ok(saleService.listSales(caller.getUsername(), pageable));
+        return ResponseEntity.ok(saleService.listSales(branchId, pageable));
+    }
+
+    @GetMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('BRANCH_ADMIN') or hasRole('MANAGER') or hasRole('CASHIER')")
+    @Operation(summary = "Get sale by ID")
+    public ResponseEntity<SaleResponse> get(@PathVariable UUID branchId,
+                                             @PathVariable UUID id) {
+        return ResponseEntity.ok(saleService.getSale(branchId, id));
     }
 }

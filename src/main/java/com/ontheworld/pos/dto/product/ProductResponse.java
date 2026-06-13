@@ -18,10 +18,14 @@ public class ProductResponse implements Serializable {
     private UUID categoryId;
     private String categoryNameTh;
     private String categoryNameEn;
+    private UUID branchId;
+    private String branchNameTh;
+    private String branchNameEn;
     private BigDecimal price;
     private BigDecimal cost;
     private Integer reorderThreshold;
     private String imageUrl;
+    private boolean isActive;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 }

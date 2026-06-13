@@ -39,28 +39,23 @@ public class InventoryServiceImpl implements InventoryService {
 
     @Override
     @Transactional
-    public void increaseStock(StockRequest request) {
-        Product product = productRepository.findById(request.getProductId())
-                .orElseThrow(() -> new EntityNotFoundException("Product not found: " + request.getProductId()));
-        Branch branch = branchRepository.findById(request.getBranchId())
-                .orElseThrow(() -> new EntityNotFoundException("Branch not found: " + request.getBranchId()));
+    public void increaseStock(UUID branchId, StockRequest request) {
+        Branch branch = requireBranch(branchId);
+        Product product = requireProduct(request.getProductId());
 
         ProductStock stock = productStockRepository.findByProductAndBranch(product, branch)
                 .orElseGet(() -> new ProductStock(product, branch, 0));
 
         stock.setQuantity(stock.getQuantity() + request.getQuantity());
         productStockRepository.save(stock);
-
         stockMovementRepository.save(new StockMovement(product, branch, request.getQuantity(), request.getReason(), null));
     }
 
     @Override
     @Transactional
-    public void decreaseStock(StockRequest request) {
-        Product product = productRepository.findById(request.getProductId())
-                .orElseThrow(() -> new EntityNotFoundException("Product not found: " + request.getProductId()));
-        Branch branch = branchRepository.findById(request.getBranchId())
-                .orElseThrow(() -> new EntityNotFoundException("Branch not found: " + request.getBranchId()));
+    public void decreaseStock(UUID branchId, StockRequest request) {
+        Branch branch = requireBranch(branchId);
+        Product product = requireProduct(request.getProductId());
 
         ProductStock stock = productStockRepository.findByProductAndBranch(product, branch)
                 .orElseThrow(() -> new EntityNotFoundException("Stock not found for product at this branch"));
@@ -72,34 +67,35 @@ public class InventoryServiceImpl implements InventoryService {
 
         stock.setQuantity(stock.getQuantity() - request.getQuantity());
         productStockRepository.save(stock);
-
         stockMovementRepository.save(new StockMovement(product, branch, -request.getQuantity(), request.getReason(), null));
     }
 
     @Override
     public List<StockResponse> listStock(UUID branchId, UUID productId) {
+        Branch branch = requireBranch(branchId);
         List<ProductStock> stocks;
 
-        if (branchId != null && productId != null) {
-            Branch branch = branchRepository.findById(branchId)
-                    .orElseThrow(() -> new EntityNotFoundException("Branch not found: " + branchId));
-            Product product = productRepository.findById(productId)
-                    .orElseThrow(() -> new EntityNotFoundException("Product not found: " + productId));
+        if (productId != null) {
+            Product product = requireProduct(productId);
             stocks = productStockRepository.findByProductAndBranch(product, branch)
                     .map(List::of).orElse(List.of());
-        } else if (branchId != null) {
-            Branch branch = branchRepository.findById(branchId)
-                    .orElseThrow(() -> new EntityNotFoundException("Branch not found: " + branchId));
-            stocks = productStockRepository.findByBranch(branch);
-        } else if (productId != null) {
-            Product product = productRepository.findById(productId)
-                    .orElseThrow(() -> new EntityNotFoundException("Product not found: " + productId));
-            stocks = productStockRepository.findByProduct(product);
         } else {
-            stocks = productStockRepository.findAll();
+            stocks = productStockRepository.findByBranch(branch);
         }
 
         return stocks.stream().map(this::toStockResponse).toList();
+    }
+
+    // ── helpers ──────────────────────────────────────────────────────────────
+
+    private Branch requireBranch(UUID branchId) {
+        return branchRepository.findById(branchId)
+                .orElseThrow(() -> new EntityNotFoundException("Branch not found: " + branchId));
+    }
+
+    private Product requireProduct(UUID productId) {
+        return productRepository.findById(productId)
+                .orElseThrow(() -> new EntityNotFoundException("Product not found: " + productId));
     }
 
     private StockResponse toStockResponse(ProductStock stock) {

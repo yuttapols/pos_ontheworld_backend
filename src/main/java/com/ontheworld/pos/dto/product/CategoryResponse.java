@@ -17,6 +17,7 @@ public class CategoryResponse implements Serializable {
     private UUID branchId;
     private String branchNameTh;
     private String branchNameEn;
+    private boolean isActive;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 }

@@ -9,15 +9,13 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.UUID;
 
 public interface ProductService {
-    ProductResponse createProduct(ProductRequest request, String callerUsername);
-    ProductResponse updateProduct(UUID id, ProductRequest request);
-    void deleteProduct(UUID id, String performedBy);
-    PageResponse<ProductResponse> listProducts(String query, UUID categoryId, String callerUsername, Pageable pageable);
-    ProductResponse getProduct(UUID id);
-    ProductResponse getProductByBarcode(String barcode);
-    ProductResponse getProductBySku(String sku);
-    ProductResponse uploadImage(UUID id, MultipartFile file);
-
-    /** Returns raw PNG bytes of the product's barcode. width/height in pixels. */
-    byte[] getBarcodeImage(UUID id, int width, int height);
+    ProductResponse createProduct(UUID branchId, ProductRequest request, String callerUsername);
+    ProductResponse getProduct(UUID branchId, UUID id);
+    ProductResponse updateProduct(UUID branchId, UUID id, ProductRequest request, String callerUsername);
+    void deleteProduct(UUID branchId, UUID id, String performedBy);
+    PageResponse<ProductResponse> listProducts(UUID branchId, String query, UUID categoryId, Pageable pageable);
+    ProductResponse getProductByBarcode(UUID branchId, String barcode);
+    ProductResponse getProductBySku(UUID branchId, String sku);
+    ProductResponse uploadImage(UUID branchId, UUID id, MultipartFile file);
+    byte[] getBarcodeImage(UUID branchId, UUID id, int width, int height);
 }

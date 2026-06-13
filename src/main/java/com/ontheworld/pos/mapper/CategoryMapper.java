@@ -25,6 +25,7 @@ public interface CategoryMapper {
     @Mapping(target = "deletedAt", ignore = true)
     @Mapping(target = "deletedBy", ignore = true)
     @Mapping(target = "branch", ignore = true)
+    @Mapping(target = "active", ignore = true)
     Category toEntity(CategoryRequest request);
 
     @Mapping(target = "id", ignore = true)
@@ -33,5 +34,6 @@ public interface CategoryMapper {
     @Mapping(target = "deletedAt", ignore = true)
     @Mapping(target = "deletedBy", ignore = true)
     @Mapping(target = "branch", ignore = true)
+    @Mapping(target = "active", ignore = true)
     void updateEntity(CategoryRequest request, @MappingTarget Category category);
 }

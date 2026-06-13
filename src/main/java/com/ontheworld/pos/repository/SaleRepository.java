@@ -15,9 +15,10 @@ import java.util.UUID;
 
 public interface SaleRepository extends JpaRepository<Sale, UUID> {
     Optional<Sale> findByReceiptNumber(String receiptNumber);
-    Page<Sale> findByCreatedAtBetween(LocalDateTime from, LocalDateTime to, Pageable pageable);
 
     Page<Sale> findByBranch(Branch branch, Pageable pageable);
+
+    Page<Sale> findByBranchAndCreatedAtBetween(Branch branch, LocalDateTime from, LocalDateTime to, Pageable pageable);
 
     long countByBranchAndCreatedAtBetween(Branch branch, LocalDateTime from, LocalDateTime to);
 

@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/v1/categories")
+@RequestMapping("/api/v1/branches/{branchId}/categories")
 @Tag(name = "Categories")
 public class CategoryController {
 
@@ -28,32 +28,43 @@ public class CategoryController {
 
     @PostMapping
     @PreAuthorize("hasRole('ADMIN') or hasRole('BRANCH_ADMIN') or hasRole('MANAGER')")
-    @Operation(summary = "Create a new category")
-    public ResponseEntity<CategoryResponse> create(@Valid @RequestBody CategoryRequest request,
+    @Operation(summary = "Create a new category for a branch")
+    public ResponseEntity<CategoryResponse> create(@PathVariable UUID branchId,
+                                                    @Valid @RequestBody CategoryRequest request,
                                                     @AuthenticationPrincipal UserDetails caller) {
-        return ResponseEntity.ok(categoryService.createCategory(request, caller.getUsername()));
+        return ResponseEntity.ok(categoryService.createCategory(branchId, request, caller.getUsername()));
     }
 
     @GetMapping
-    @Operation(summary = "List categories (branch-scoped for non-ADMIN)")
-    public ResponseEntity<List<CategoryResponse>> list(@AuthenticationPrincipal UserDetails caller) {
-        return ResponseEntity.ok(categoryService.listCategories(caller.getUsername()));
+    @Operation(summary = "List all categories for a branch")
+    public ResponseEntity<List<CategoryResponse>> list(@PathVariable UUID branchId) {
+        return ResponseEntity.ok(categoryService.listCategories(branchId));
+    }
+
+    @GetMapping("/{id}")
+    @Operation(summary = "Get category by ID")
+    public ResponseEntity<CategoryResponse> get(@PathVariable UUID branchId,
+                                                 @PathVariable UUID id) {
+        return ResponseEntity.ok(categoryService.getCategory(branchId, id));
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN') or hasRole('MANAGER')")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('BRANCH_ADMIN') or hasRole('MANAGER')")
     @Operation(summary = "Update a category")
-    public ResponseEntity<CategoryResponse> update(@PathVariable UUID id,
-                                                    @Valid @RequestBody CategoryRequest request) {
-        return ResponseEntity.ok(categoryService.updateCategory(id, request));
+    public ResponseEntity<CategoryResponse> update(@PathVariable UUID branchId,
+                                                    @PathVariable UUID id,
+                                                    @Valid @RequestBody CategoryRequest request,
+                                                    @AuthenticationPrincipal UserDetails caller) {
+        return ResponseEntity.ok(categoryService.updateCategory(branchId, id, request, caller.getUsername()));
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('BRANCH_ADMIN') or hasRole('MANAGER')")
     @Operation(summary = "Soft delete a category")
-    public ResponseEntity<Void> delete(@PathVariable UUID id,
-                                       @AuthenticationPrincipal UserDetails user) {
-        categoryService.deleteCategory(id, user.getUsername());
+    public ResponseEntity<Void> delete(@PathVariable UUID branchId,
+                                       @PathVariable UUID id,
+                                       @AuthenticationPrincipal UserDetails caller) {
+        categoryService.deleteCategory(branchId, id, caller.getUsername());
         return ResponseEntity.noContent().build();
     }
 }

@@ -14,11 +14,17 @@ public interface CategoryRepository extends JpaRepository<Category, UUID> {
 
     Optional<Category> findByNameTh(String nameTh);
 
-    /** Scoped list: global (branch IS NULL) OR belongs to the given branch */
+    /** Branch-only list (no global categories) */
+    @Query("SELECT c FROM Category c WHERE c.deletedAt IS NULL AND c.branch = :branch")
+    List<Category> findAllByBranch(@Param("branch") Branch branch);
+
+    boolean existsByNameThAndBranchAndDeletedAtIsNull(String nameTh, Branch branch);
+
+    boolean existsByNameThAndBranchAndIdNotAndDeletedAtIsNull(String nameTh, Branch branch, UUID excludeId);
+
+    /** Legacy scoped list kept for internal use: global OR branch */
     @Query("SELECT c FROM Category c WHERE c.deletedAt IS NULL AND (c.branch IS NULL OR c.branch = :branch)")
     List<Category> findByBranchScope(@Param("branch") Branch branch);
 
-    /** Duplicate name check within the same branch scope */
-    boolean existsByNameThAndBranchAndDeletedAtIsNull(String nameTh, Branch branch);
     boolean existsByNameThAndBranchIsNullAndDeletedAtIsNull(String nameTh);
 }

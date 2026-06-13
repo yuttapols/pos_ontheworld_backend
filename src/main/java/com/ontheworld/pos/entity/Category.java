@@ -25,7 +25,9 @@ public class Category extends SoftDeletableEntity {
     @Column(length = 250)
     private String descriptionEn;
 
-    /** null = global (visible to all branches); non-null = belongs to specific branch */
+    @Column(nullable = false)
+    private boolean isActive = true;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "branch_id")
     private Branch branch;
